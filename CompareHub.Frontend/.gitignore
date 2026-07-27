@@ -1,0 +1,48 @@
+# Node
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build output
+dist/
+**/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+.npmrc
+
+# local env files
+.env
+.env.*
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+coverage/
+.cache/
