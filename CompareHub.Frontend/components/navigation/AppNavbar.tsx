@@ -14,6 +14,7 @@ export function AppNavbar() {
         </Link>
 
         <div className="flex items-center gap-3">
+          {/* Temporarily hidden — re-enable once auth flow is ready.
           <button
             type="button"
             disabled
@@ -28,6 +29,7 @@ export function AppNavbar() {
           >
             Create Account
           </button>
+          */}
         </div>
       </div>
     </nav>
