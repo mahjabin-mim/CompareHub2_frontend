@@ -93,6 +93,15 @@ export const usePublicProductSearchStream = () => {
 
   useEffect(() => closeStream, [closeStream]);
 
+  const clear = useCallback(() => {
+    closeStream();
+    setQuery('');
+    setStores([]);
+    setResults([]);
+    setError('');
+    setIsSearching(false);
+  }, [closeStream]);
+
   const search = useCallback(
     (rawQuery: string) => {
       const trimmedQuery = rawQuery.trim();
@@ -154,5 +163,5 @@ export const usePublicProductSearchStream = () => {
     [closeStream]
   );
 
-  return { query, stores, results, isSearching, error, search };
+  return { query, stores, results, isSearching, error, search, clear };
 };

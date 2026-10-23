@@ -1,9 +1,17 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { FloatingOrbs } from '@/components/decor/FloatingOrbs';
 import { PublicSearchResults } from '@/features/ProductDiscovery/product-discovery.components/PublicSearchResults';
+import { SearchSuggestions } from '@/features/ProductDiscovery/product-discovery.components/SearchSuggestions';
 import { usePublicProductSearchStream } from '@/features/ProductDiscovery/product-discovery.hooks';
+import {
+  addRecentSearch,
+  buildSearchUrl,
+  getQueryFromUrl,
+  loadRecentSearches,
+  saveRecentSearches
+} from '@/features/ProductDiscovery/product-discovery.recent-searches';
 
 const featureCards = [
   {
@@ -38,11 +46,53 @@ const footerColumns = [
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const publicSearch = usePublicProductSearchStream();
+  const { search, clear } = publicSearch;
+
+  // The search lives in the URL (?q=sunscreen) so results can be shared, bookmarked and reached with Back.
+  const runSearch = useCallback(
+    (rawQuery: string, updateUrl: boolean) => {
+      const trimmed = rawQuery.trim();
+      if (!trimmed) {
+        return;
+      }
+
+      setQuery(trimmed);
+      search(trimmed);
+      const recent = addRecentSearch(loadRecentSearches(), trimmed);
+      saveRecentSearches(recent);
+      setRecentSearches(recent);
+      if (updateUrl) {
+        window.history.pushState(null, '', buildSearchUrl(window.location.pathname, trimmed));
+      }
+    },
+    [search]
+  );
+
+  useEffect(() => {
+    setRecentSearches(loadRecentSearches());
+    const fromUrl = getQueryFromUrl(window.location.search);
+    if (fromUrl) {
+      runSearch(fromUrl, false);
+    }
+
+    const onPopState = () => {
+      const urlQuery = getQueryFromUrl(window.location.search);
+      if (urlQuery) {
+        runSearch(urlQuery, false);
+      } else {
+        setQuery('');
+        clear();
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [runSearch, clear]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    publicSearch.search(query);
+    runSearch(query, true);
   };
 
   return (
@@ -93,7 +143,7 @@ export default function HomePage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-[#3A2417]">Quick Search</h2>
-              <p className="mt-2 text-sm text-[#3A2417]">Search across all your saved skincare stores at once.</p>
+              <p className="mt-2 text-sm text-[#3A2417]">Search 17 Bangladeshi skincare stores at once and compare prices.</p>
             </div>
           </div>
 
@@ -117,6 +167,15 @@ export default function HomePage() {
               Search
             </button>
           </form>
+
+          <SearchSuggestions
+            recentSearches={recentSearches}
+            onSelect={(selected) => runSearch(selected, true)}
+            onClearRecent={() => {
+              saveRecentSearches([]);
+              setRecentSearches([]);
+            }}
+          />
         </div>
       </section>
 
