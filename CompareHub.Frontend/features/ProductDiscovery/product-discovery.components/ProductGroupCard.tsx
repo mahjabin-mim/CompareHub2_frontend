@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { ProductGroup } from '../product-discovery.grouping';
 import { storeDisplayName } from '../product-discovery.stores';
+import { useWishlist } from '../product-discovery.wishlist.hooks';
 import { ProductImage } from './ProductImage';
 
 const VISIBLE_OFFERS = 3;
@@ -16,6 +17,8 @@ type ProductGroupCardProps = {
 
 export function ProductGroupCard({ group, animationDelay }: ProductGroupCardProps) {
   const [showAllOffers, setShowAllOffers] = useState(false);
+  const wishlist = useWishlist();
+  const saved = wishlist.has(group);
   const cheapest = group.offers[0];
   const offers = showAllOffers ? group.offers : group.offers.slice(0, VISIBLE_OFFERS);
   const hiddenCount = group.offers.length - VISIBLE_OFFERS;
@@ -34,6 +37,18 @@ export function ProductGroupCard({ group, animationDelay }: ProductGroupCardProp
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
       </a>
+      <button
+        type="button"
+        onClick={() => wishlist.toggle(group)}
+        aria-pressed={saved}
+        aria-label={saved ? `Remove ${group.name} from wishlist` : `Save ${group.name} to wishlist`}
+        className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-brand-100/95 shadow-[0_6px_16px_rgba(58,36,23,0.18)] transition-all duration-200 hover:scale-110 active:scale-90"
+      >
+        <svg viewBox="0 0 24 24" className="h-5 w-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+          fill={saved ? '#C1592E' : 'none'} stroke="#C1592E">
+          <path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z" />
+        </svg>
+      </button>
       {group.storeCount > 1 && (
         <span className="absolute left-3 top-3 rounded-full bg-brand-500 px-3 py-1 text-xs font-bold text-white shadow-[0_6px_16px_rgba(193,89,46,0.3)]">
           {group.storeCount} stores
