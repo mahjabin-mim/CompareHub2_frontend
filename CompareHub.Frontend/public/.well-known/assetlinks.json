@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.comparehub.app",
+      "sha256_cert_fingerprints": [
+        "08:50:8A:D3:42:2D:71:9F:71:22:3A:82:48:43:C1:1B:74:91:FD:9B:54:28:F5:C1:75:B9:EE:70:CC:C1:B9:FE"
+      ]
+    }
+  }
+]
