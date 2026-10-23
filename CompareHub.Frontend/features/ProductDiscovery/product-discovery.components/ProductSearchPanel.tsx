@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useProductSearch } from '../product-discovery.hooks';
 import { AxiosError } from 'axios';
+import { ProductImage } from './ProductImage';
 
 export function ProductSearchPanel() {
   const [submittedQuery, setSubmittedQuery] = useState('');
@@ -71,18 +72,12 @@ export function ProductSearchPanel() {
               style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
             >
               <div className="aspect-[4/3] overflow-hidden bg-brand-50">
-                {product.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={product.imageUrl}
-                    alt={product.productName}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center px-6 text-center text-sm font-semibold text-brand-500">
-                    {product.sourceWebsite}
-                  </div>
-                )}
+                <ProductImage
+                  src={product.imageUrl}
+                  alt={product.productName}
+                  fallbackLabel={product.sourceWebsite}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
               </div>
 
               <div className="space-y-3 p-4">
