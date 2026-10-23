@@ -13,6 +13,16 @@ describe("ProductImage", () => {
         expect(screen.getByText("kireibd.com")).toBeTruthy();
     });
 
+    it("tries the next store's image before giving up", () => {
+        render(createElement(ProductImage, { src: ["https://a.example/1.jpg", "https://b.example/2.jpg"], alt: "Serum", fallbackLabel: "Kirei" }));
+
+        fireEvent.error(screen.getByAltText("Serum"));
+        expect(screen.getByAltText("Serum").getAttribute("src")).toBe("https://b.example/2.jpg");
+
+        fireEvent.error(screen.getByAltText("Serum"));
+        expect(screen.getByText("Kirei")).toBeTruthy();
+    });
+
     it("shows the store name when there is no image at all", () => {
         render(createElement(ProductImage, { src: "", alt: "Serum", fallbackLabel: "arogga.com" }));
 

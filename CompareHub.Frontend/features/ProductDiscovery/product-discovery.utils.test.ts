@@ -1,15 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { StoreProductResult } from "./product-discovery.types";
-import { filterByStore, getRelevance, sortProducts } from "./product-discovery.utils";
+import { ProductGroup } from "./product-discovery.grouping";
+import { filterGroupsByStore, getRelevance, sortGroups } from "./product-discovery.utils";
 
-const product = (productName: string, price: number, storeKey = "kireibd.com"): StoreProductResult => ({
-    productName,
-    price,
-    productUrl: `https://${storeKey}/${encodeURIComponent(productName)}`,
-    imageUrl: "",
-    sourceWebsite: storeKey,
-    storeKey
-});
+const group = (name: string, prices: Record<string, number>): ProductGroup => {
+    const offers = Object.entries(prices)
+        .map(([storeKey, price]) => ({
+            productName: name,
+            price,
+            productUrl: `https://${storeKey}/${encodeURIComponent(name)}`,
+            imageUrl: "",
+            sourceWebsite: storeKey,
+            storeKey
+        }))
+        .sort((a, b) => a.price - b.price);
+    return {
+        key: name,
+        name,
+        imageUrls: [],
+        offers,
+        lowestPrice: offers[0].price,
+        highestPrice: offers[offers.length - 1].price,
+        storeCount: offers.length
+    };
+};
 
 describe("getRelevance", () => {
     it("returns the share of query words found in the name", () => {
@@ -22,29 +35,38 @@ describe("getRelevance", () => {
     });
 });
 
-describe("sortProducts", () => {
-    const products = [
-        product("Vitamin C Face Wash", 300),
-        product("Vitamin C Serum", 900),
-        product("Vitamin C Serum Mini", 450)
+describe("sortGroups", () => {
+    const groups = [
+        group("Vitamin C Face Wash", { "kireibd.com": 300 }),
+        group("Vitamin C Serum", { "kireibd.com": 900, "arogga.com": 950 }),
+        group("Vitamin C Serum Mini", { "kireibd.com": 450 })
     ];
 
-    it("orders best match by relevance, then by lowest price", () => {
-        expect(sortProducts(products, "best-match", "vitamin c serum").map((x) => x.price)).toEqual([450, 900, 300]);
+    it("orders best match by relevance, then by number of stores, then by lowest price", () => {
+        expect(sortGroups(groups, "best-match", "vitamin c serum").map((x) => x.name)).toEqual([
+            "Vitamin C Serum",
+            "Vitamin C Serum Mini",
+            "Vitamin C Face Wash"
+        ]);
     });
 
-    it("orders by price in both directions without mutating the input", () => {
-        expect(sortProducts(products, "price-asc", "").map((x) => x.price)).toEqual([300, 450, 900]);
-        expect(sortProducts(products, "price-desc", "").map((x) => x.price)).toEqual([900, 450, 300]);
-        expect(products.map((x) => x.price)).toEqual([300, 900, 450]);
+    it("orders by lowest price in both directions without mutating the input", () => {
+        expect(sortGroups(groups, "price-asc", "").map((x) => x.lowestPrice)).toEqual([300, 450, 900]);
+        expect(sortGroups(groups, "price-desc", "").map((x) => x.lowestPrice)).toEqual([900, 450, 300]);
+        expect(groups.map((x) => x.lowestPrice)).toEqual([300, 900, 450]);
+    });
+
+    it("orders by number of stores", () => {
+        expect(sortGroups(groups, "most-stores", "")[0].name).toBe("Vitamin C Serum");
     });
 });
 
-describe("filterByStore", () => {
-    it("keeps only the selected store, or everything when none is selected", () => {
-        const products = [product("A", 100, "kireibd.com"), product("B", 200, "arogga.com")];
+describe("filterGroupsByStore", () => {
+    it("keeps products sold by the selected store, or everything when none is selected", () => {
+        const groups = [group("A", { "kireibd.com": 100 }), group("B", { "arogga.com": 200, "kireibd.com": 210 })];
 
-        expect(filterByStore(products, "arogga.com").map((x) => x.productName)).toEqual(["B"]);
-        expect(filterByStore(products, null)).toHaveLength(2);
+        expect(filterGroupsByStore(groups, "arogga.com").map((x) => x.name)).toEqual(["B"]);
+        expect(filterGroupsByStore(groups, "kireibd.com")).toHaveLength(2);
+        expect(filterGroupsByStore(groups, null)).toHaveLength(2);
     });
 });

@@ -1,6 +1,6 @@
-import { StoreProductResult } from './product-discovery.types';
+import type { ProductGroup } from './product-discovery.grouping';
 
-export type ProductSortOrder = 'best-match' | 'price-asc' | 'price-desc';
+export type ProductSortOrder = 'best-match' | 'price-asc' | 'price-desc' | 'most-stores';
 
 const toTokens = (value: string) =>
   value
@@ -19,19 +19,26 @@ export const getRelevance = (productName: string, query: string) => {
   return queryTokens.filter((token) => name.includes(token)).length / queryTokens.length;
 };
 
-export const sortProducts = (products: StoreProductResult[], order: ProductSortOrder, query: string) => {
-  const sorted = [...products];
+export const sortGroups = (groups: ProductGroup[], order: ProductSortOrder, query: string) => {
+  const sorted = [...groups];
   if (order === 'price-asc') {
-    return sorted.sort((a, b) => a.price - b.price);
+    return sorted.sort((a, b) => a.lowestPrice - b.lowestPrice);
   }
 
   if (order === 'price-desc') {
-    return sorted.sort((a, b) => b.price - a.price);
+    return sorted.sort((a, b) => b.lowestPrice - a.lowestPrice);
   }
 
-  const relevance = new Map(sorted.map((product) => [product, getRelevance(product.productName, query)]));
-  return sorted.sort((a, b) => relevance.get(b)! - relevance.get(a)! || a.price - b.price);
+  if (order === 'most-stores') {
+    return sorted.sort((a, b) => b.storeCount - a.storeCount || a.lowestPrice - b.lowestPrice);
+  }
+
+  // Among equally relevant products, ones sold in more stores are the ones worth comparing.
+  const relevance = new Map(sorted.map((group) => [group, getRelevance(group.name, query)]));
+  return sorted.sort(
+    (a, b) => relevance.get(b)! - relevance.get(a)! || b.storeCount - a.storeCount || a.lowestPrice - b.lowestPrice
+  );
 };
 
-export const filterByStore = (products: StoreProductResult[], storeKey: string | null) =>
-  storeKey ? products.filter((product) => product.storeKey === storeKey) : products;
+export const filterGroupsByStore = (groups: ProductGroup[], storeKey: string | null) =>
+  storeKey ? groups.filter((group) => group.offers.some((offer) => offer.storeKey === storeKey)) : groups;
