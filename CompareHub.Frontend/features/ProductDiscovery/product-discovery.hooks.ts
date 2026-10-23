@@ -1,8 +1,15 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { productDiscoveryService } from './product-discovery.services';
-import { UpsertProductSourcePayload } from './product-discovery.types';
+import {
+  PublicSearchStart,
+  PublicSourceResult,
+  StoreProductResult,
+  StoreProgress,
+  UpsertProductSourcePayload
+} from './product-discovery.types';
 
 export const useProductSearch = (query: string) =>
   useQuery({
@@ -69,4 +76,83 @@ export const useTestProductSourceConnection = () => {
     onSuccess: () => {
     }
   });
+};
+
+export const usePublicProductSearchStream = () => {
+  const [query, setQuery] = useState('');
+  const [stores, setStores] = useState<StoreProgress[]>([]);
+  const [results, setResults] = useState<StoreProductResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [error, setError] = useState('');
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  const closeStream = useCallback(() => {
+    eventSourceRef.current?.close();
+    eventSourceRef.current = null;
+  }, []);
+
+  useEffect(() => closeStream, [closeStream]);
+
+  const search = useCallback(
+    (rawQuery: string) => {
+      const trimmedQuery = rawQuery.trim();
+      if (!trimmedQuery) {
+        return;
+      }
+
+      closeStream();
+      setQuery(trimmedQuery);
+      setStores([]);
+      setResults([]);
+      setError('');
+      setIsSearching(true);
+
+      const eventSource = productDiscoveryService.streamPublicProducts(trimmedQuery);
+      eventSourceRef.current = eventSource;
+      let started = false;
+
+      eventSource.addEventListener('start', (event) => {
+        started = true;
+        const data = JSON.parse((event as MessageEvent<string>).data) as PublicSearchStart;
+        setStores(data.sources.map((sourceWebsite) => ({ sourceWebsite, status: 'searching', resultCount: 0 })));
+      });
+
+      eventSource.addEventListener('source', (event) => {
+        const data = JSON.parse((event as MessageEvent<string>).data) as PublicSourceResult;
+        setStores((current) =>
+          current.map((store) =>
+            store.sourceWebsite === data.sourceWebsite
+              ? { ...store, status: 'done', resultCount: data.results.length }
+              : store
+          )
+        );
+        setResults((current) => [
+          ...current,
+          ...data.results.map((product) => ({ ...product, storeKey: data.sourceWebsite }))
+        ]);
+      });
+
+      eventSource.addEventListener('done', () => {
+        closeStream();
+        setIsSearching(false);
+      });
+
+      eventSource.onerror = () => {
+        // EventSource reconnects on its own after an error, which would rerun the whole search.
+        closeStream();
+        setIsSearching(false);
+        setStores((current) =>
+          current.map((store) => (store.status === 'searching' ? { ...store, status: 'failed' } : store))
+        );
+        setError(
+          started
+            ? 'The connection dropped before every store answered. Showing the results found so far.'
+            : 'Unable to reach the search server right now. Please try again in a moment.'
+        );
+      };
+    },
+    [closeStream]
+  );
+
+  return { query, stores, results, isSearching, error, search };
 };

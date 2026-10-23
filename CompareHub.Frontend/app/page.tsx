@@ -1,10 +1,9 @@
 'use client';
 
-import { AxiosError } from 'axios';
 import { FormEvent, useState } from 'react';
 import { FloatingOrbs } from '@/components/decor/FloatingOrbs';
-import { productDiscoveryService } from '@/features/ProductDiscovery/product-discovery.services';
-import { ProductResult, ProductSourceCheck } from '@/features/ProductDiscovery/product-discovery.types';
+import { PublicSearchResults } from '@/features/ProductDiscovery/product-discovery.components/PublicSearchResults';
+import { usePublicProductSearchStream } from '@/features/ProductDiscovery/product-discovery.hooks';
 
 const featureCards = [
   {
@@ -39,44 +38,12 @@ const footerColumns = [
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
-  const [submittedQuery, setSubmittedQuery] = useState('');
-  const [results, setResults] = useState<ProductResult[]>([]);
-  const [sourceChecks, setSourceChecks] = useState<ProductSourceCheck[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchError, setSearchError] = useState('');
+  const publicSearch = usePublicProductSearchStream();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const trimmedQuery = query.trim();
-    if (!trimmedQuery) {
-      return;
-    }
-
-    setSubmittedQuery(trimmedQuery);
-    setSearchError('');
-    setIsSearching(true);
-    setSourceChecks([]);
-
-    try {
-      const response = await productDiscoveryService.searchPublicProducts(trimmedQuery);
-      setResults(response.results);
-      setSourceChecks(response.sourceChecks ?? []);
-    } catch (error) {
-      const message =
-        error instanceof AxiosError
-          ? error.response?.data?.message ?? 'Unable to search the selected stores right now.'
-          : 'Unable to search the selected stores right now.';
-      setResults([]);
-      setSourceChecks([]);
-      setSearchError(message);
-    } finally {
-      setIsSearching(false);
-    }
+    publicSearch.search(query);
   };
-
-  const checkedSourceCount = sourceChecks.filter((source) => source.isChecked).length;
-  const matchedSourceCount = new Set(results.map((product) => product.sourceWebsite.toLowerCase())).size;
-  const matchedProductCount = results.length;
 
   return (
     <main className="relative min-h-[calc(100vh-96px)] overflow-hidden bg-[radial-gradient(circle_at_top_left,#FBF0E6_0,#FEFAF7_34%,#FBF0E6_100%)] text-[#3A2417]">
@@ -139,7 +106,7 @@ export default function HomePage() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search skincare products (ex: vitamin c serum, sunscreen, moisturizer)"
-              className="h-12 min-w-0 flex-1 rounded-lg border border-brand-300 bg-brand-100 px-5 text-sm outline-none transition-all duration-200 placeholder:text-[#3A2417] focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
+              className="h-12 min-w-0 shrink-0 rounded-lg border border-brand-300 bg-brand-100 px-5 text-sm outline-none md:flex-1 transition-all duration-200 placeholder:text-[#3A2417] focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
             />
 
             <button
@@ -150,98 +117,18 @@ export default function HomePage() {
               Search
             </button>
           </form>
-
-          {submittedQuery && (
-            <div className="mt-4 animate-fade-in-up rounded-lg border border-dashed border-brand-300 bg-brand-50/60 p-4 text-sm text-[#3A2417]">
-              {isSearching ? (
-                <>
-                  Checking 18 CompareHub skincare websites for{' '}
-                  <span className="font-semibold text-[#3A2417]">"{submittedQuery}"</span>.
-                </>
-              ) : (
-                <>
-                  Checked {checkedSourceCount || 18} CompareHub skincare websites for{' '}
-                  <span className="font-semibold text-[#3A2417]">{submittedQuery}</span>
-                  {' and found '}
-                  <span className="font-semibold text-[#3A2417]">{matchedProductCount}</span>{' '}
-                  {matchedProductCount === 1 ? 'product' : 'products'} from{' '}
-                  <span className="font-semibold text-[#3A2417]">{matchedSourceCount}</span>{' '}
-                  {matchedSourceCount === 1 ? 'store' : 'stores'}.
-                </>
-              )}
-            </div>
-          )}
         </div>
       </section>
 
-      {(isSearching || searchError || submittedQuery) && (
-        <section className="mx-auto max-w-6xl px-4 py-4">
-          {isSearching && (
-            <div className="grid gap-4 md:grid-cols-3">
-              {[...Array(6)].map((_, index) => (
-                <div
-                  key={index}
-                  className="skeleton h-72 animate-fade-in rounded-lg border border-brand-200"
-                  style={{ animationDelay: `${index * 60}ms` }}
-                />
-              ))}
-            </div>
-          )}
-
-          {!isSearching && searchError && (
-            <div className="animate-shake rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
-              {searchError}
-            </div>
-          )}
-
-          {!isSearching && !searchError && submittedQuery && results.length === 0 && (
-            <div className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 text-sm text-[#3A2417]">
-              No products found for <span className="font-semibold">{submittedQuery}</span>.
-            </div>
-          )}
-
-          {!isSearching && results.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((product, index) => (
-                <a
-                  key={`${product.productUrl}-${index}`}
-                  href={product.productUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group animate-fade-in-up overflow-hidden rounded-lg border border-brand-200 bg-brand-100 shadow-[0_12px_36px_rgba(193,89,46,0.08)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-[0_18px_44px_rgba(193,89,46,0.14)]"
-                  style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
-                >
-                  <div className="aspect-[4/3] overflow-hidden bg-brand-50">
-                    {product.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={product.imageUrl}
-                        alt={product.productName}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center px-6 text-center text-sm font-semibold text-brand-500">
-                        {product.sourceWebsite}
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-3 p-4">
-                    <p className="text-xs font-bold uppercase tracking-wide text-brand-500">{product.sourceWebsite}</p>
-                    <h3 className="line-clamp-2 min-h-12 text-base font-bold text-[#3A2417] transition-colors group-hover:text-brand-700">
-                      {product.productName}
-                    </h3>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-lg font-bold text-brand-700">৳{product.price.toLocaleString()}</p>
-                      <span className="text-sm font-semibold text-brand-500 transition-transform duration-300 group-hover:translate-x-1">
-                        Open →
-                      </span>
-                    </div>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-        </section>
+      {publicSearch.query && (
+        <PublicSearchResults
+          key={publicSearch.query}
+          query={publicSearch.query}
+          stores={publicSearch.stores}
+          results={publicSearch.results}
+          isSearching={publicSearch.isSearching}
+          error={publicSearch.error}
+        />
       )}
 
       <section className="mx-auto grid max-w-6xl gap-4 px-4 py-4 md:grid-cols-4">

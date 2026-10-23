@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/api-client';
+import { API_BASE_URL, apiClient } from '@/lib/api-client';
 import { ApiResponse, ProductSearchResponse, ProductSource, UpsertProductSourcePayload } from './product-discovery.types';
 
 export const productDiscoveryService = {
@@ -21,6 +21,12 @@ export const productDiscoveryService = {
       params: { query }
     });
     return response.data.data;
+  },
+
+  // Server-sent events: "start" lists the stores, "source" arrives once per store, then "done".
+  streamPublicProducts(query: string): EventSource {
+    const params = new URLSearchParams({ query });
+    return new EventSource(`${API_BASE_URL}/api/v1/products/search/public/stream?${params}`);
   },
 
   async getProductSources(): Promise<ProductSource[]> {

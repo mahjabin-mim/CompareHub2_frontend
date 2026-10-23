@@ -12,6 +12,29 @@ export type ProductSearchResponse = {
   sourceChecks?: ProductSourceCheck[];
 };
 
+export type PublicSourceResult = {
+  sourceWebsite: string;
+  results: ProductResult[];
+};
+
+export type PublicSearchStart = {
+  query: string;
+  sources: string[];
+};
+
+export type StoreSearchStatus = 'searching' | 'done' | 'failed';
+
+export type StoreProgress = {
+  sourceWebsite: string;
+  status: StoreSearchStatus;
+  resultCount: number;
+};
+
+export type StoreProductResult = ProductResult & {
+  // The store list's name for the source, which can differ from the scraper's sourceWebsite label.
+  storeKey: string;
+};
+
 export type ProductSourceCheck = {
   sourceWebsite: string;
   isChecked: boolean;
