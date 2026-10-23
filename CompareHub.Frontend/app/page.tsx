@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { FloatingOrbs } from '@/components/decor/FloatingOrbs';
 import { PublicSearchResults } from '@/features/ProductDiscovery/product-discovery.components/PublicSearchResults';
 import { SearchSuggestions } from '@/features/ProductDiscovery/product-discovery.components/SearchSuggestions';
+import { ANDROID_APK_URL } from '@/lib/app-links';
 import { usePublicProductSearchStream } from '@/features/ProductDiscovery/product-discovery.hooks';
 import {
   addRecentSearch,
@@ -27,13 +28,13 @@ const featureCards = [
     icon: <path d="M20 13 11 22l-9-9V4h9l9 9ZM7.5 8.5h.01" />
   },
   {
-    title: 'Saved Searches',
-    description: 'Save your searches and quickly access your recent products.',
+    title: 'Wishlist',
+    description: 'Save products to your account and watch how their price changes over time.',
     icon: <path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z" />
   },
   {
     title: 'Price Alerts',
-    description: 'Get notified when prices drop on products you care about.',
+    description: 'Get an email or a phone notification when a wishlist product gets cheaper.',
     icon: <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
   }
 ];
@@ -246,18 +247,18 @@ export default function HomePage() {
           ))}
 
           <div>
-            <p className="text-sm font-bold text-[#3A2417]">Stay updated</p>
-            <p className="mt-3 text-sm leading-6 text-[#3A2417]">Subscribe to get the best skincare deals straight to your inbox.</p>
-            <div className="mt-3 flex gap-2">
-              <input
-                disabled
-                placeholder="Enter your email"
-                className="h-10 min-w-0 flex-1 rounded-md border border-brand-300 bg-brand-100 px-3 text-sm text-brand-900/50"
-              />
-              <button disabled className="h-10 cursor-not-allowed rounded-md bg-brand-500/70 px-4 text-sm font-semibold text-white">
-                Subscribe
-              </button>
-            </div>
+            <p className="text-sm font-bold text-[#3A2417]">Get the app</p>
+            <p className="mt-3 text-sm leading-6 text-[#3A2417]">Price-drop notifications on your phone, one tap from your home screen.</p>
+            <a
+              href={ANDROID_APK_URL}
+              className="mt-3 inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(193,89,46,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-700 active:scale-95"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
+              </svg>
+              Download for Android
+            </a>
+            <p className="mt-2 text-xs leading-5 text-[#3A2417]/70">On iPhone: tap Share, then Add to Home Screen.</p>
           </div>
         </div>
         <p className="pb-5 text-center text-sm text-[#3A2417]">&copy; 2024 CompareHub. All rights reserved.</p>

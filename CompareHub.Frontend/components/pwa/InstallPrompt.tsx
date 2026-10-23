@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ANDROID_APK_URL } from '@/lib/app-links';
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -12,6 +13,7 @@ const DISMISSED_KEY = 'comparehub_install_dismissed';
 export function InstallPrompt() {
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIos, setIsIos] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -30,6 +32,7 @@ export function InstallPrompt() {
     // iOS has no install event, so show the manual Add to Home Screen steps instead.
     const ios = /iphone|ipad|ipod/i.test(userAgent);
     setIsIos(ios);
+    setIsAndroid(/android/i.test(userAgent));
     if (ios) {
       setVisible(true);
     }
@@ -88,6 +91,11 @@ export function InstallPrompt() {
           </p>
         ) : (
           <p className="text-xs leading-5">Add it to your home screen like an app</p>
+        )}
+        {isAndroid && (
+          <a href={ANDROID_APK_URL} className="mt-0.5 inline-block text-xs font-semibold text-brand-500 underline-offset-2 hover:underline">
+            Or download the Android app
+          </a>
         )}
       </div>
       {installEvent && (

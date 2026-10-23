@@ -1,93 +1,62 @@
 'use client';
 
-import { useLogin } from '@/features/Authentications/authentication.hooks';
-import { AxiosError } from 'axios';
-import { FloatingOrbs } from '@/components/decor/FloatingOrbs';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
+import { AuthShell, inputClass, labelClass } from '@/components/auth/AuthShell';
+import { errorMessageFrom, useAuthPage } from '@/components/auth/useAuthPage';
+import { useLogin } from '@/features/Authentications/authentication.hooks';
 
 export default function LoginPage() {
-  const router = useRouter();
   const login = useLogin();
-
+  const { notice, search, googleError, setGoogleError, onGoogleCredential } = useAuthPage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const errorMessage =
-    login.error instanceof AxiosError
-      ? login.error.response?.data?.message ?? 'Invalid email or password.'
-      : 'Invalid email or password.';
-
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    await login.mutateAsync({ email, password });
-    router.push('/product-discovery');
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    setGoogleError('');
+    login.mutate({ email: email.trim(), password });
   };
 
+  const error = googleError || (login.isError ? errorMessageFrom(login.error, 'Invalid email or password.') : '');
+
   return (
-    <main className="relative flex min-h-[calc(100vh-96px)] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top_left,#FBF0E6_0,#FEFAF7_34%,#FBF0E6_100%)] px-4 py-12">
-      <FloatingOrbs />
-      <div className="w-full max-w-md animate-scale-in rounded-2xl border border-brand-200 bg-brand-100 p-8 shadow-[0_24px_70px_rgba(193,89,46,0.13)]">
-        <div className="mb-6 flex flex-col items-center text-center">
-          <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-500 text-lg font-bold text-white shadow-[0_10px_22px_rgba(193,89,46,0.25)]">
-            C
-          </span>
-          <h1 className="mt-4 text-2xl font-bold text-[#3A2417]">Welcome back</h1>
-          <p className="mt-1 text-sm text-[#3A2417]/70">Sign in to keep tracking your favorite skincare prices.</p>
-        </div>
-
-        <form onSubmit={submit} className="space-y-4">
-          <div>
-            <label htmlFor="login-email" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Email
-            </label>
-            <input
-              id="login-email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="you@example.com"
-              className="w-full rounded-lg border border-brand-300 bg-brand-100 px-4 py-3 text-sm text-[#3A2417] outline-none transition-all duration-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="login-password" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-700">
-              Password
-            </label>
-            <input
-              id="login-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              placeholder="••••••••"
-              className="w-full rounded-lg border border-brand-300 bg-brand-100 px-4 py-3 text-sm text-[#3A2417] outline-none transition-all duration-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
-              required
-            />
-          </div>
-
-          {login.isError && (
-            <p className="animate-shake rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
-              {errorMessage}
-            </p>
-          )}
-
-          <button
-            disabled={login.isPending}
-            className="w-full rounded-lg bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(193,89,46,0.28)] transition-all duration-200 hover:bg-brand-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-brand-300 disabled:shadow-none disabled:active:scale-100"
-          >
-            {login.isPending ? 'Signing in...' : 'Login'}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-[#3A2417]/70">
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to see your wishlist and get price-drop alerts."
+      notice={notice}
+      error={error}
+      onGoogleCredential={onGoogleCredential}
+      onGoogleError={setGoogleError}
+      footer={
+        <>
           Don&apos;t have an account?{' '}
-          <Link href="/create-account" className="font-semibold text-brand-500 hover:text-brand-700">
+          <Link href={`/create-account${search}`} className="font-semibold text-brand-500 hover:text-brand-700">
             Create one
           </Link>
-        </p>
-      </div>
-    </main>
+        </>
+      }
+    >
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <label htmlFor="login-email" className={labelClass}>
+            Email
+          </label>
+          <input id="login-email" value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="you@example.com" className={inputClass} required />
+        </div>
+        <div>
+          <label htmlFor="login-password" className={labelClass}>
+            Password
+          </label>
+          <input id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete="current-password" placeholder="••••••••" className={inputClass} required />
+        </div>
+        <button
+          disabled={login.isPending}
+          className="w-full rounded-lg bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(193,89,46,0.28)] transition-all duration-200 hover:bg-brand-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-brand-300 disabled:shadow-none disabled:active:scale-100"
+        >
+          {login.isPending ? 'Signing in...' : 'Sign in'}
+        </button>
+      </form>
+    </AuthShell>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from '@/components/providers';
+import { AccountEffects } from '@/components/auth/AccountEffects';
 import { AppNavbar } from '@/components/navigation/AppNavbar';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker';
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Providers>
           <AppNavbar />
+          <AccountEffects />
           {children}
           <InstallPrompt />
         </Providers>

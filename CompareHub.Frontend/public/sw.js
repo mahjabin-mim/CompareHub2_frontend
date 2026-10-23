@@ -1,6 +1,6 @@
 // Makes CompareHub installable and keeps the app shell available offline.
 // Searches go to the backend on another origin and are never cached, so prices stay live.
-const CACHE = "comparehub-v1";
+const CACHE = "comparehub-v2";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/icons/icon-192.png"])));
@@ -36,3 +36,31 @@ function save(request, response) {
   }
   return response;
 }
+
+// Price-drop notifications (web push). The payload is {title, body, url}.
+self.addEventListener("push", (e) => {
+  let data = { title: "CompareHub", body: "A price on your wishlist changed.", url: "/wishlist" };
+  try { data = { ...data, ...e.data.json() }; } catch {}
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: "price-drop",
+      data: { url: data.url },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const target = new URL((e.notification.data && e.notification.data.url) || "/wishlist", self.location.origin).href;
+  e.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      for (const client of windows) {
+        if (client.url === target && "focus" in client) return client.focus();
+      }
+      return clients.openWindow(target);
+    }),
+  );
+});
