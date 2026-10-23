@@ -1,6 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {
+  filterGroupsByBrand,
+  filterGroupsByPrice,
+  getBrandOptions,
+  parsePriceInput
+} from '../product-discovery.filters';
 import { groupProducts } from '../product-discovery.grouping';
 import { storeDisplayName } from '../product-discovery.stores';
 import { StoreProductResult, StoreProgress } from '../product-discovery.types';
@@ -20,13 +26,27 @@ type PublicSearchResultsProps = {
 export function PublicSearchResults({ query, stores, results, isSearching, error }: PublicSearchResultsProps) {
   const [sortOrder, setSortOrder] = useState<ProductSortOrder>('best-match');
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   // The same product from several stores becomes one card with each store's price.
   const groups = useMemo(() => groupProducts(results), [results]);
+  const brandOptions = useMemo(() => getBrandOptions(groups), [groups]);
+  const priceRange = useMemo(
+    () => ({ min: parsePriceInput(minPrice), max: parsePriceInput(maxPrice) }),
+    [minPrice, maxPrice]
+  );
+  const hasFilters = selectedStore !== null || selectedBrand !== null || priceRange.min !== null || priceRange.max !== null;
   const visibleGroups = useMemo(
-    () => sortGroups(filterGroupsByStore(groups, selectedStore), sortOrder, query),
-    [groups, selectedStore, sortOrder, query]
+    () =>
+      sortGroups(
+        filterGroupsByPrice(filterGroupsByBrand(filterGroupsByStore(groups, selectedStore), selectedBrand), priceRange),
+        sortOrder,
+        query
+      ),
+    [groups, selectedStore, selectedBrand, priceRange, sortOrder, query]
   );
 
   const finishedStoreCount = stores.filter((store) => store.status !== 'searching').length;
@@ -37,6 +57,17 @@ export function PublicSearchResults({ query, stores, results, isSearching, error
     setSelectedStore((current) => (current === storeKey ? null : storeKey));
     setVisibleCount(PAGE_SIZE);
   };
+
+  const clearFilters = () => {
+    setSelectedStore(null);
+    setSelectedBrand(null);
+    setMinPrice('');
+    setMaxPrice('');
+    setVisibleCount(PAGE_SIZE);
+  };
+
+  const inputClass =
+    'h-10 rounded-lg border border-brand-300 bg-brand-100 px-3 text-sm font-medium outline-none transition-all duration-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-200';
 
   return (
     <section className="mx-auto max-w-6xl space-y-4 px-4 py-4">
@@ -111,6 +142,73 @@ export function PublicSearchResults({ query, stores, results, isSearching, error
             ))}
           </div>
         )}
+
+        {groups.length > 0 && (
+          <div className="flex flex-wrap items-end gap-3 border-t border-brand-200 pt-4">
+            {brandOptions.length > 0 && (
+              <label className="flex flex-col gap-1 text-xs font-bold uppercase tracking-wide text-brand-500">
+                Brand
+                <select
+                  value={selectedBrand ?? ''}
+                  onChange={(event) => {
+                    setSelectedBrand(event.target.value || null);
+                    setVisibleCount(PAGE_SIZE);
+                  }}
+                  className={`${inputClass} max-w-[14rem] text-[#3A2417] normal-case tracking-normal`}
+                >
+                  <option value="">All brands</option>
+                  {brandOptions.map(({ brand, count }) => (
+                    <option key={brand} value={brand}>
+                      {brand} ({count})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <div className="flex items-end gap-2">
+              <label className="flex flex-col gap-1 text-xs font-bold uppercase tracking-wide text-brand-500">
+                Price (৳)
+                <input
+                  inputMode="numeric"
+                  value={minPrice}
+                  onChange={(event) => {
+                    setMinPrice(event.target.value);
+                    setVisibleCount(PAGE_SIZE);
+                  }}
+                  placeholder="Min"
+                  aria-label="Minimum price"
+                  className={`${inputClass} w-24 text-[#3A2417]`}
+                />
+              </label>
+              <span className="pb-2 text-sm text-[#3A2417]/70">to</span>
+              <input
+                inputMode="numeric"
+                value={maxPrice}
+                onChange={(event) => {
+                  setMaxPrice(event.target.value);
+                  setVisibleCount(PAGE_SIZE);
+                }}
+                placeholder="Max"
+                aria-label="Maximum price"
+                className={`${inputClass} w-24 text-[#3A2417]`}
+              />
+            </div>
+            {hasFilters && (
+              <>
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="h-10 rounded-lg px-3 text-sm font-semibold text-brand-500 transition-colors hover:bg-brand-200 hover:text-brand-700"
+                >
+                  Clear filters
+                </button>
+                <p className="pb-2 text-sm text-[#3A2417]/80">
+                  Showing {visibleGroups.length} of {groups.length}
+                </p>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {error && (
@@ -133,6 +231,15 @@ export function PublicSearchResults({ query, stores, results, isSearching, error
         <div className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 text-sm text-[#3A2417]">
           No products found for <span className="font-semibold">{query}</span>. Try a shorter or more general search, like
           &ldquo;sunscreen&rdquo; or &ldquo;niacinamide serum&rdquo;.
+        </div>
+      )}
+
+      {groups.length > 0 && visibleGroups.length === 0 && (
+        <div className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 text-sm text-[#3A2417]">
+          No products match these filters.{' '}
+          <button type="button" onClick={clearFilters} className="font-semibold text-brand-500 underline-offset-2 hover:underline">
+            Clear filters
+          </button>
         </div>
       )}
 
