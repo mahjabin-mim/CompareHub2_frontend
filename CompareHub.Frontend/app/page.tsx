@@ -2,6 +2,7 @@
 
 import { AxiosError } from 'axios';
 import { FormEvent, useState } from 'react';
+import { FloatingOrbs } from '@/components/decor/FloatingOrbs';
 import { productDiscoveryService } from '@/features/ProductDiscovery/product-discovery.services';
 import { ProductResult, ProductSourceCheck } from '@/features/ProductDiscovery/product-discovery.types';
 
@@ -78,35 +79,36 @@ export default function HomePage() {
   const matchedProductCount = results.length;
 
   return (
-    <main className="min-h-[calc(100vh-96px)] bg-[radial-gradient(circle_at_top_left,#F6F1FF_0,#FCFAFF_34%,#F6F1FF_100%)] text-[#312B4A]">
+    <main className="relative min-h-[calc(100vh-96px)] overflow-hidden bg-[radial-gradient(circle_at_top_left,#FBF0E6_0,#FEFAF7_34%,#FBF0E6_100%)] text-[#3A2417]">
+      <FloatingOrbs />
       <section className="mx-auto max-w-6xl px-4 pb-5 pt-8">
-        <div className="relative min-h-[340px] overflow-hidden rounded-lg border border-brand-200 bg-brand-100 shadow-[0_24px_70px_rgba(105,75,185,0.13)]">
+        <div className="group relative min-h-[340px] overflow-hidden rounded-lg border border-brand-200 bg-brand-100 shadow-[0_24px_70px_rgba(193,89,46,0.13)] transition-shadow duration-500 hover:shadow-[0_28px_80px_rgba(193,89,46,0.20)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/skincare-hero.png"
-            alt="Lavender skincare products arranged on a display stand"
-            className="absolute inset-y-0 right-0 h-full w-full object-cover object-[64%_center] opacity-95 saturate-[1.55] contrast-[1.16] brightness-[0.95]"
+            alt="Burnt orange skincare products arranged on a display stand"
+            className="absolute inset-y-0 right-0 h-full w-full origin-right animate-ken-burns object-cover object-[64%_center] opacity-95 hue-rotate-[115deg] saturate-[2] contrast-[1.25] brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.03]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-100 via-brand-100/92 via-45% to-brand-100/10" />
 
           <div className="relative z-10 max-w-xl p-7 md:p-10 lg:p-12">
-            <div className="inline-flex rounded-full bg-brand-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-brand-700">
+            <div className="inline-flex animate-fade-in-up rounded-full bg-brand-200 px-4 py-2 text-xs font-bold uppercase tracking-wide text-brand-700">
               Skincare Price Discovery
             </div>
 
-            <h1 className="mt-6 text-4xl font-bold leading-tight text-[#312B4A] md:text-5xl">
+            <h1 className="mt-6 animate-fade-in-up text-4xl font-bold leading-tight text-[#3A2417] [animation-delay:100ms] md:text-5xl">
               Find the Best Prices
               <span className="block text-brand-500">for Your Skincare</span>
             </h1>
 
-            <p className="mt-5 text-base leading-7 text-[#312B4A] md:text-lg">
+            <p className="mt-5 animate-fade-in-up text-base leading-7 text-[#3A2417] [animation-delay:200ms] md:text-lg">
               Search across your favorite skincare stores and compare prices to save more on what you love.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 flex animate-fade-in-up flex-wrap gap-3 [animation-delay:300ms]">
               <a
                 href="#quick-search"
-                className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(124,92,220,0.28)] transition hover:bg-brand-700"
+                className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(193,89,46,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-[0_16px_32px_rgba(193,89,46,0.36)] active:translate-y-0 active:scale-95"
               >
                 <span aria-hidden="true">Q</span>
                 Advanced Search
@@ -117,14 +119,14 @@ export default function HomePage() {
       </section>
 
       <section id="quick-search" className="mx-auto max-w-6xl px-4 py-3">
-        <div className="rounded-lg border border-brand-200 bg-brand-100 p-5 shadow-[0_18px_50px_rgba(101,70,180,0.10)] md:p-7">
+        <div className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 shadow-[0_18px_50px_rgba(193,89,46,0.10)] transition-shadow duration-300 hover:shadow-[0_22px_60px_rgba(193,89,46,0.14)] md:p-7">
           <div className="mb-5 flex items-center gap-5">
             <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand-200 text-3xl font-light text-brand-500">
               Q
             </div>
             <div>
-              <h2 className="text-xl font-bold text-[#312B4A]">Quick Search</h2>
-              <p className="mt-2 text-sm text-[#312B4A]">Search across all your saved skincare stores at once.</p>
+              <h2 className="text-xl font-bold text-[#3A2417]">Quick Search</h2>
+              <p className="mt-2 text-sm text-[#3A2417]">Search across all your saved skincare stores at once.</p>
             </div>
           </div>
 
@@ -137,12 +139,12 @@ export default function HomePage() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search skincare products (ex: vitamin c serum, sunscreen, moisturizer)"
-              className="h-12 min-w-0 flex-1 rounded-lg border border-brand-300 bg-brand-100 px-5 text-sm outline-none transition placeholder:text-[#312B4A] focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
+              className="h-12 min-w-0 flex-1 rounded-lg border border-brand-300 bg-brand-100 px-5 text-sm outline-none transition-all duration-200 placeholder:text-[#3A2417] focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
             />
 
             <button
               type="submit"
-              className="h-12 rounded-lg bg-brand-500 px-8 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(124,92,220,0.24)] transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-brand-300 disabled:shadow-none"
+              className="h-12 rounded-lg bg-brand-500 px-8 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(193,89,46,0.24)] transition-all duration-200 hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:bg-brand-300 disabled:shadow-none disabled:active:scale-100"
               disabled={!query.trim()}
             >
               Search
@@ -150,20 +152,20 @@ export default function HomePage() {
           </form>
 
           {submittedQuery && (
-            <div className="mt-4 rounded-lg border border-dashed border-brand-300 bg-brand-50/60 p-4 text-sm text-[#312B4A]">
+            <div className="mt-4 animate-fade-in-up rounded-lg border border-dashed border-brand-300 bg-brand-50/60 p-4 text-sm text-[#3A2417]">
               {isSearching ? (
                 <>
                   Checking 18 CompareHub skincare websites for{' '}
-                  <span className="font-semibold text-[#312B4A]">"{submittedQuery}"</span>.
+                  <span className="font-semibold text-[#3A2417]">"{submittedQuery}"</span>.
                 </>
               ) : (
                 <>
                   Checked {checkedSourceCount || 18} CompareHub skincare websites for{' '}
-                  <span className="font-semibold text-[#312B4A]">{submittedQuery}</span>
+                  <span className="font-semibold text-[#3A2417]">{submittedQuery}</span>
                   {' and found '}
-                  <span className="font-semibold text-[#312B4A]">{matchedProductCount}</span>{' '}
+                  <span className="font-semibold text-[#3A2417]">{matchedProductCount}</span>{' '}
                   {matchedProductCount === 1 ? 'product' : 'products'} from{' '}
-                  <span className="font-semibold text-[#312B4A]">{matchedSourceCount}</span>{' '}
+                  <span className="font-semibold text-[#3A2417]">{matchedSourceCount}</span>{' '}
                   {matchedSourceCount === 1 ? 'store' : 'stores'}.
                 </>
               )}
@@ -177,17 +179,23 @@ export default function HomePage() {
           {isSearching && (
             <div className="grid gap-4 md:grid-cols-3">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="h-72 animate-pulse rounded-lg border border-brand-200 bg-brand-100" />
+                <div
+                  key={index}
+                  className="skeleton h-72 animate-fade-in rounded-lg border border-brand-200"
+                  style={{ animationDelay: `${index * 60}ms` }}
+                />
               ))}
             </div>
           )}
 
           {!isSearching && searchError && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">{searchError}</div>
+            <div className="animate-shake rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+              {searchError}
+            </div>
           )}
 
           {!isSearching && !searchError && submittedQuery && results.length === 0 && (
-            <div className="rounded-lg border border-brand-200 bg-brand-100 p-5 text-sm text-[#312B4A]">
+            <div className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 text-sm text-[#3A2417]">
               No products found for <span className="font-semibold">{submittedQuery}</span>.
             </div>
           )}
@@ -200,12 +208,17 @@ export default function HomePage() {
                   href={product.productUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="group overflow-hidden rounded-lg border border-brand-200 bg-brand-100 shadow-[0_12px_36px_rgba(101,70,180,0.08)] transition hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-[0_18px_44px_rgba(101,70,180,0.14)]"
+                  className="group animate-fade-in-up overflow-hidden rounded-lg border border-brand-200 bg-brand-100 shadow-[0_12px_36px_rgba(193,89,46,0.08)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-[0_18px_44px_rgba(193,89,46,0.14)]"
+                  style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
                 >
-                  <div className="aspect-[4/3] bg-brand-50">
+                  <div className="aspect-[4/3] overflow-hidden bg-brand-50">
                     {product.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={product.imageUrl} alt={product.productName} className="h-full w-full object-cover" />
+                      <img
+                        src={product.imageUrl}
+                        alt={product.productName}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
                     ) : (
                       <div className="flex h-full items-center justify-center px-6 text-center text-sm font-semibold text-brand-500">
                         {product.sourceWebsite}
@@ -214,12 +227,14 @@ export default function HomePage() {
                   </div>
                   <div className="space-y-3 p-4">
                     <p className="text-xs font-bold uppercase tracking-wide text-brand-500">{product.sourceWebsite}</p>
-                    <h3 className="line-clamp-2 min-h-12 text-base font-bold text-[#312B4A] group-hover:text-brand-700">
+                    <h3 className="line-clamp-2 min-h-12 text-base font-bold text-[#3A2417] transition-colors group-hover:text-brand-700">
                       {product.productName}
                     </h3>
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-lg font-bold text-brand-700">৳{product.price.toLocaleString()}</p>
-                      <span className="text-sm font-semibold text-brand-500">Open</span>
+                      <span className="text-sm font-semibold text-brand-500 transition-transform duration-300 group-hover:translate-x-1">
+                        Open →
+                      </span>
                     </div>
                   </div>
                 </a>
@@ -230,15 +245,19 @@ export default function HomePage() {
       )}
 
       <section className="mx-auto grid max-w-6xl gap-4 px-4 py-4 md:grid-cols-4">
-        {featureCards.map((feature) => (
-          <div key={feature.title} className="rounded-lg border border-brand-200 bg-brand-100 p-5 shadow-[0_12px_36px_rgba(101,70,180,0.08)]">
-            <div className="mb-4 grid h-16 w-16 place-items-center rounded-lg bg-brand-50 text-brand-500">
+        {featureCards.map((feature, index) => (
+          <div
+            key={feature.title}
+            className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 shadow-[0_12px_36px_rgba(193,89,46,0.08)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-[0_18px_44px_rgba(193,89,46,0.14)]"
+            style={{ animationDelay: `${index * 90}ms` }}
+          >
+            <div className="mb-4 grid h-16 w-16 place-items-center rounded-lg bg-brand-50 text-brand-500 transition-transform duration-300 group-hover:scale-105">
               <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
                 {feature.icon}
               </svg>
             </div>
-            <h3 className="font-bold text-[#312B4A]">{feature.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-[#312B4A]">{feature.description}</p>
+            <h3 className="font-bold text-[#3A2417]">{feature.title}</h3>
+            <p className="mt-2 text-sm leading-6 text-[#3A2417]">{feature.description}</p>
           </div>
         ))}
       </section>
@@ -248,24 +267,32 @@ export default function HomePage() {
           <div>
             <div className="flex items-center gap-3">
               <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand-500 font-bold text-white">C</div>
-              <p className="text-lg font-bold text-[#312B4A]">CompareHub</p>
+              <p className="text-lg font-bold text-[#3A2417]">CompareHub</p>
             </div>
-            <p className="mt-3 max-w-xs text-sm leading-6 text-[#312B4A]">
+            <p className="mt-3 max-w-xs text-sm leading-6 text-[#3A2417]">
               Smart search. Better comparison. More savings on skincare.
             </p>
             <div className="mt-4 flex gap-3 text-sm font-bold text-brand-500">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200">I</span>
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200">F</span>
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200">T</span>
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200">P</span>
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200 transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-300">
+                I
+              </span>
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200 transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-300">
+                F
+              </span>
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200 transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-300">
+                T
+              </span>
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-200 transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-300">
+                P
+              </span>
             </div>
           </div>
 
           {footerColumns.map(([heading, ...items]) => (
             <div key={heading}>
-              <p className="text-sm font-bold text-[#312B4A]">{heading}</p>
+              <p className="text-sm font-bold text-[#3A2417]">{heading}</p>
               {items.map((item) => (
-                <p key={item} className="mt-3 text-sm text-[#312B4A]">
+                <p key={item} className="mt-3 text-sm text-[#3A2417]">
                   {item}
                 </p>
               ))}
@@ -273,8 +300,8 @@ export default function HomePage() {
           ))}
 
           <div>
-            <p className="text-sm font-bold text-[#312B4A]">Stay updated</p>
-            <p className="mt-3 text-sm leading-6 text-[#312B4A]">Subscribe to get the best skincare deals straight to your inbox.</p>
+            <p className="text-sm font-bold text-[#3A2417]">Stay updated</p>
+            <p className="mt-3 text-sm leading-6 text-[#3A2417]">Subscribe to get the best skincare deals straight to your inbox.</p>
             <div className="mt-3 flex gap-2">
               <input
                 disabled
@@ -287,7 +314,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        <p className="pb-5 text-center text-sm text-[#312B4A]">&copy; 2024 CompareHub. All rights reserved.</p>
+        <p className="pb-5 text-center text-sm text-[#3A2417]">&copy; 2024 CompareHub. All rights reserved.</p>
       </footer>
     </main>
   );

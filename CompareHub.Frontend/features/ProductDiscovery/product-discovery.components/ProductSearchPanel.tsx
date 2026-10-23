@@ -14,9 +14,9 @@ export function ProductSearchPanel() {
       : 'Unable to fetch products.';
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-5">
       <form
-        className="rounded-xl bg-white p-4 shadow-sm"
+        className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 shadow-[0_18px_50px_rgba(193,89,46,0.10)] transition-shadow duration-300 hover:shadow-[0_22px_60px_rgba(193,89,46,0.14)] md:p-6"
         onSubmit={(e) => {
           e.preventDefault();
           setSubmittedQuery(input.trim());
@@ -27,24 +27,36 @@ export function ProductSearchPanel() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Search products like iPhone, laptop, monitor"
-            className="flex-1 rounded-lg border border-slate-300 px-4 py-2 outline-none focus:border-brand-500"
+            className="h-12 min-w-0 flex-1 rounded-lg border border-brand-300 bg-brand-100 px-5 text-sm text-[#3A2417] outline-none transition-all duration-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
           />
-          <button className="rounded-lg bg-brand-500 px-5 py-2 font-medium text-white hover:bg-brand-700">Search</button>
+          <button className="h-12 rounded-lg bg-brand-500 px-8 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(193,89,46,0.24)] transition-all duration-200 hover:bg-brand-700 active:scale-95">
+            Search
+          </button>
         </div>
       </form>
 
       {isLoading && (
-        <div className="grid gap-3 md:grid-cols-2">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-28 animate-pulse rounded-xl bg-slate-200" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="skeleton h-72 animate-fade-in rounded-lg border border-brand-200"
+              style={{ animationDelay: `${i * 60}ms` }}
+            />
           ))}
         </div>
       )}
 
-      {isError && <div className="rounded-xl bg-red-50 p-4 text-red-700">{errorMessage}</div>}
+      {isError && (
+        <div className="animate-shake rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+          {errorMessage}
+        </div>
+      )}
 
       {!isLoading && data && data.results.length === 0 && (
-        <div className="rounded-xl bg-white p-6 text-slate-600 shadow-sm">No products found for this query.</div>
+        <div className="animate-fade-in-up rounded-lg border border-brand-200 bg-brand-100 p-5 text-sm text-[#3A2417]">
+          No products found for this query.
+        </div>
       )}
 
       {data && data.results.length > 0 && (
@@ -55,14 +67,19 @@ export function ProductSearchPanel() {
               href={product.productUrl}
               target="_blank"
               rel="noreferrer"
-              className="group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-md"
+              className="group animate-fade-in-up overflow-hidden rounded-lg border border-brand-200 bg-brand-100 shadow-[0_12px_36px_rgba(193,89,46,0.08)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-[0_18px_44px_rgba(193,89,46,0.14)]"
+              style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
             >
-              <div className="aspect-[4/3] bg-slate-100">
+              <div className="aspect-[4/3] overflow-hidden bg-brand-50">
                 {product.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.imageUrl} alt={product.productName} className="h-full w-full object-cover" />
+                  <img
+                    src={product.imageUrl}
+                    alt={product.productName}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
                 ) : (
-                  <div className="flex h-full items-center justify-center px-5 text-center text-sm font-medium text-slate-400">
+                  <div className="flex h-full items-center justify-center px-6 text-center text-sm font-semibold text-brand-500">
                     {product.sourceWebsite}
                   </div>
                 )}
@@ -70,15 +87,17 @@ export function ProductSearchPanel() {
 
               <div className="space-y-3 p-4">
                 <div>
-                  <p className="text-xs font-medium uppercase text-slate-500">{product.sourceWebsite}</p>
-                  <h3 className="mt-1 line-clamp-2 min-h-12 text-base font-semibold text-slate-900 group-hover:text-brand-700">
+                  <p className="text-xs font-bold uppercase tracking-wide text-brand-500">{product.sourceWebsite}</p>
+                  <h3 className="mt-1 line-clamp-2 min-h-12 text-base font-bold text-[#3A2417] transition-colors group-hover:text-brand-700">
                     {product.productName}
                   </h3>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <p className="text-lg font-bold text-brand-700">৳{product.price.toLocaleString()}</p>
-                  <span className="text-sm font-medium text-slate-500 group-hover:text-brand-700">Open</span>
+                  <span className="text-sm font-semibold text-brand-500 transition-transform duration-300 group-hover:translate-x-1">
+                    Open →
+                  </span>
                 </div>
               </div>
             </a>
