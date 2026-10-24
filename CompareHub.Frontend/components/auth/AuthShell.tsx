@@ -11,8 +11,7 @@ type AuthShellProps = {
   subtitle: string;
   notice?: string;
   error?: string;
-  onGoogleCredential: (idToken: string) => void;
-  onGoogleError: (message: string) => void;
+  next: string;
   children: ReactNode;
   footer: ReactNode;
 };
@@ -21,7 +20,7 @@ export const inputClass =
   'w-full rounded-lg border border-brand-300 bg-brand-100 px-4 py-3 text-sm text-[#3A2417] outline-none transition-all duration-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-200';
 export const labelClass = 'mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-700';
 
-export function AuthShell({ title, subtitle, notice, error, onGoogleCredential, onGoogleError, children, footer }: AuthShellProps) {
+export function AuthShell({ title, subtitle, notice, error, next, children, footer }: AuthShellProps) {
   const config = useAuthConfig();
   const googleClientId = config.data?.googleClientId;
 
@@ -45,7 +44,7 @@ export function AuthShell({ title, subtitle, notice, error, onGoogleCredential, 
 
         {googleClientId && (
           <>
-            <GoogleSignInButton clientId={googleClientId} onCredential={onGoogleCredential} onError={onGoogleError} />
+            <GoogleSignInButton clientId={googleClientId} next={next} />
             <div className="my-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-[#3A2417]/50">
               <span className="h-px flex-1 bg-brand-200" />
               or with email

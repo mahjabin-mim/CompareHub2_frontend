@@ -8,18 +8,17 @@ import { useRegister } from '@/features/Authentications/authentication.hooks';
 
 export default function CreateAccountPage() {
   const register = useRegister();
-  const { notice, search, googleError, setGoogleError, onGoogleCredential } = useAuthPage();
+  const { notice, search, next } = useAuthPage();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    setGoogleError('');
     register.mutate({ fullName: fullName.trim(), email: email.trim(), password });
   };
 
-  const error = googleError || (register.isError ? errorMessageFrom(register.error, 'Account creation failed.') : '');
+  const error = register.isError ? errorMessageFrom(register.error, 'Account creation failed.') : '';
 
   return (
     <AuthShell
@@ -27,8 +26,7 @@ export default function CreateAccountPage() {
       subtitle="Save products and get an alert when their price drops."
       notice={notice}
       error={error}
-      onGoogleCredential={onGoogleCredential}
-      onGoogleError={setGoogleError}
+      next={next}
       footer={
         <>
           Already have an account?{' '}

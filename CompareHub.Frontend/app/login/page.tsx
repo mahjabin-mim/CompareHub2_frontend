@@ -8,17 +8,16 @@ import { useLogin } from '@/features/Authentications/authentication.hooks';
 
 export default function LoginPage() {
   const login = useLogin();
-  const { notice, search, googleError, setGoogleError, onGoogleCredential } = useAuthPage();
+  const { notice, search, next } = useAuthPage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    setGoogleError('');
     login.mutate({ email: email.trim(), password });
   };
 
-  const error = googleError || (login.isError ? errorMessageFrom(login.error, 'Invalid email or password.') : '');
+  const error = login.isError ? errorMessageFrom(login.error, 'Invalid email or password.') : '';
 
   return (
     <AuthShell
@@ -26,8 +25,7 @@ export default function LoginPage() {
       subtitle="Sign in to see your wishlist and get price-drop alerts."
       notice={notice}
       error={error}
-      onGoogleCredential={onGoogleCredential}
-      onGoogleError={setGoogleError}
+      next={next}
       footer={
         <>
           Don&apos;t have an account?{' '}

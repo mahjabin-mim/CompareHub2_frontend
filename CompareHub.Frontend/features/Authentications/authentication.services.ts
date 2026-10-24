@@ -12,8 +12,8 @@ export const authenticationService = {
     return response.data.data;
   },
 
-  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>('/api/v1/auth/google', { idToken });
+  async loginWithGoogle(payload: { idToken: string; nonce: string }): Promise<AuthResponse> {
+    const response = await apiClient.post<ApiResponse<AuthResponse>>('/api/v1/auth/google', payload);
     return response.data.data;
   },
 
