@@ -34,7 +34,7 @@ describe("InstallPrompt", () => {
         document.body.innerHTML = "";
         await renderPrompt();
         installable();
-        expect(screen.getByText("Or download the Android app").getAttribute("href")).toContain("CompareHub2_android/releases/latest/download/CompareHub.apk");
+        expect(screen.getByText("Or download the Android app").getAttribute("href")).toBe("/CompareHub.apk");
     });
 
     it("explains Share > Add to Home Screen on iPhone and never offers the Android app", async () => {

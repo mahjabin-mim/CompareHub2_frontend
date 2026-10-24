@@ -1,6 +1,6 @@
-// The signed Android app is published as a GitHub release asset; "latest" always points at the newest build.
-export const ANDROID_APK_URL = 'https://github.com/mahjabin-mim/CompareHub2_android/releases/latest/download/CompareHub.apk';
+// The signed Android app (built from the CompareHub2_android repo) is served from this site itself,
+// so the download works for everyone without needing access to that repository.
+export const ANDROID_APK_URL = '/CompareHub.apk';
 
-// Off until the first APK exists, so visitors are never sent to a missing download.
-// Turn on with NEXT_PUBLIC_ANDROID_APP=true.
+// Turn on with NEXT_PUBLIC_ANDROID_APP=true once the APK exists, so visitors are never sent to a missing file.
 export const isAndroidAppAvailable = () => process.env.NEXT_PUBLIC_ANDROID_APP === 'true';
