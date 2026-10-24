@@ -19,7 +19,7 @@ Next.js (App Router) frontend for CompareHub — lets a user search/compare prod
    npm install
    npm run dev
    ```
-   Runs at `http://localhost:3000`.
+   Runs at `http://localhost:3107`.
 
 ## Scripts
 
