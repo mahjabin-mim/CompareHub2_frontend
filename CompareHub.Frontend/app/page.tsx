@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { FloatingOrbs } from '@/components/decor/FloatingOrbs';
 import { PublicSearchResults } from '@/features/ProductDiscovery/product-discovery.components/PublicSearchResults';
 import { SearchSuggestions } from '@/features/ProductDiscovery/product-discovery.components/SearchSuggestions';
-import { ANDROID_APK_URL } from '@/lib/app-links';
+import { ANDROID_APK_URL, isAndroidAppAvailable } from '@/lib/app-links';
 import { usePublicProductSearchStream } from '@/features/ProductDiscovery/product-discovery.hooks';
 import {
   addRecentSearch,
@@ -249,16 +249,20 @@ export default function HomePage() {
           <div>
             <p className="text-sm font-bold text-[#3A2417]">Get the app</p>
             <p className="mt-3 text-sm leading-6 text-[#3A2417]">Price-drop notifications on your phone, one tap from your home screen.</p>
-            <a
-              href={ANDROID_APK_URL}
-              className="mt-3 inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(193,89,46,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-700 active:scale-95"
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
-              </svg>
-              Download for Android
-            </a>
-            <p className="mt-2 text-xs leading-5 text-[#3A2417]/70">On iPhone: tap Share, then Add to Home Screen.</p>
+            {isAndroidAppAvailable() && (
+              <a
+                href={ANDROID_APK_URL}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(193,89,46,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-700 active:scale-95"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
+                </svg>
+                Download for Android
+              </a>
+            )}
+            <p className="mt-2 text-xs leading-5 text-[#3A2417]/70">
+              {isAndroidAppAvailable() ? 'On iPhone: tap Share, then Add to Home Screen.' : 'Open the site in your phone browser, then use Install (Android) or Share → Add to Home Screen (iPhone).'}
+            </p>
           </div>
         </div>
         <p className="pb-5 text-center text-sm text-[#3A2417]">&copy; 2024 CompareHub. All rights reserved.</p>

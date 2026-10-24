@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ANDROID_APK_URL } from '@/lib/app-links';
+import { ANDROID_APK_URL, isAndroidAppAvailable } from '@/lib/app-links';
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -92,7 +92,7 @@ export function InstallPrompt() {
         ) : (
           <p className="text-xs leading-5">Add it to your home screen like an app</p>
         )}
-        {isAndroid && (
+        {isAndroid && isAndroidAppAvailable() && (
           <a href={ANDROID_APK_URL} className="mt-0.5 inline-block text-xs font-semibold text-brand-500 underline-offset-2 hover:underline">
             Or download the Android app
           </a>
